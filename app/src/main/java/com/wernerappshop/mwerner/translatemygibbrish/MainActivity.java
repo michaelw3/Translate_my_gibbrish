@@ -3,8 +3,10 @@ package com.wernerappshop.mwerner.translatemygibbrish;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -14,12 +16,22 @@ import de.greenrobot.event.EventBus;
 public class MainActivity extends ActionBarActivity {
     private Button translateButton = null;
     private EditText textToDecode = null;
-    private String tempText = null;
+    private String decodeString = null;
     private TextView decodedText = null;
+    //setting fragment data members
+    private static final String MODEL_TAG = "model";
+    private Translate mFrag=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mFrag = (Translate)getFragmentManager().findFragmentByTag(MODEL_TAG);
+
+        if (mFrag == null){
+            mFrag = new Translate();
+            getFragmentManager().beginTransaction().add(mFrag,MODEL_TAG).commit();
+        }
         // Get intent, action and MIME type
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -28,13 +40,33 @@ public class MainActivity extends ActionBarActivity {
         //findig edittext and insert shared text
         textToDecode = (EditText) findViewById(R.id.textToDecode);
         translateButton = (Button) findViewById(R.id.button);
-        decodedText = (TextView) findViewById(R.id.decodedText);
 
+
+        decodedText = (TextView) findViewById(R.id.decodedText);
+        setDecodeString();
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type)) {
                 handleSendText(intent); // Handle text being sent
             }
         }
+
+
+        translateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("Activity", "Button clicked");
+                setDecodeString();
+                //setting up model fragment for
+                Bundle data = new Bundle();
+                data.putString("decodeString", decodeString);
+                if (mFrag != null){
+                    mFrag = null;
+                    mFrag = new Translate();
+                    getFragmentManager().beginTransaction().add(mFrag,MODEL_TAG).commit();
+                }
+
+            }
+        });
     }
     @Override
     public void onStart() {
@@ -51,6 +83,7 @@ public class MainActivity extends ActionBarActivity {
     public void onEventMainThread(DecodeReadyEvent event) {
         decodedText.setText(event.getDecodedString());
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -78,5 +111,10 @@ public class MainActivity extends ActionBarActivity {
             textToDecode.setText(sharedText, TextView.BufferType.EDITABLE);
         }
     }
-
+    public String getDecodeString(){
+        return decodeString;
+    }
+    private void setDecodeString(){
+        decodeString = textToDecode.getText().toString();
+    }
 }

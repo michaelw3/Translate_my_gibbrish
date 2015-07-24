@@ -2,6 +2,7 @@ package com.wernerappshop.mwerner.translatemygibbrish;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 
 import de.greenrobot.event.EventBus;
 
@@ -17,12 +18,15 @@ public class Translate extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle extra = getArguments();
-        value = extra.getString("decodeString");
+//        Bundle extra = getArguments();
+//        value = extra.getString("decodeString");
         setRetainInstance(true);
-
+        MainActivity activity = (MainActivity) getActivity();
+        value = activity.getDecodeString();
+    Log.i("Fragment", "oncreate");
         if(!isStarted){
             isStarted = true;
+            Log.i("isStarted", isStarted.toString());
             new DecodeStringHebToEng().run();
         }
     }
@@ -30,11 +34,14 @@ public class Translate extends Fragment {
     class  DecodeStringHebToEng extends Thread{
         @Override
         public void run() {
-            super.run();
+            Log.i("runnable", "i Run!");
+            Log.i("value", value);
             for (char c : value.toCharArray()) {
                 sb.append(returnTempValue(c));
+                Log.d("String decoded",sb.toString());
             }
-            EventBus.getDefault().post(new DecodeReadyEvent(sb.reverse().toString()));
+            EventBus.getDefault().post(new DecodeReadyEvent(sb.toString()));
+            super.run();
         }
     }
         private  char returnTempValue(char c){
