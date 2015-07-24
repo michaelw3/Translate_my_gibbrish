@@ -14,11 +14,10 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:background="@color/abc_secondary_text_material_light"
         android:layout_alignRight="@+id/button"
         android:layout_alignEnd="@+id/button" />
 
-    <android.support.v7.internal.widget.ContentFrameLayout
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/decodedText"
